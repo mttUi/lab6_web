@@ -1,21 +1,48 @@
 ﻿services:
   nginx:
     image: nginx:alpine
-    container_name: lab6_web_nginx
+    container_name: lab6_nginx
     ports:
       - "8080:80"
     volumes:
       - ./www:/var/www/html
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
 
   php:
     build: .
-    container_name: lab6_web_php
+    container_name: lab6_php
     volumes:
       - ./www:/var/www/html
+    depends_on:
+      - redis
+      - elasticsearch
+      - clickhouse
 
   redis:
-    image: redis:alpine
-    container_name: lab6_web_redis
+    image: redis:7-alpine
+    container_name: lab6_redis
     ports:
       - "6379:6379"
+
+  elasticsearch:
+    image: elasticsearch:8.10.2
+    container_name: lab6_elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:24-alpine
+    container_name: lab6_clickhouse
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+
+volumes:
+  elasticsearch_data:
+  clickhouse_data:
