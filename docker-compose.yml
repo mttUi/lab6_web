@@ -1,0 +1,21 @@
+﻿services:
+  nginx:
+    image: nginx:alpine
+    container_name: lab6_web_nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./www:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+
+  php:
+    build: .
+    container_name: lab6_web_php
+    volumes:
+      - ./www:/var/www/html
+
+  redis:
+    image: redis:alpine
+    container_name: lab6_web_redis
+    ports:
+      - "6379:6379"
